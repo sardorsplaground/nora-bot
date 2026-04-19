@@ -1,0 +1,4 @@
+# No external dependencies needed — uses only Python stdlib
+# Add these if you integrate AI responses or a database:
+# openai>=1.0.0
+# supabase>=2.0.0
