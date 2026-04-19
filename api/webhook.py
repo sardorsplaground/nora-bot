@@ -1,5 +1,5 @@
 """
-Nora â VitaFirst's Digital Supplier Sourcing Agent
+Nora \u2014 VitaFirst's Digital Supplier Sourcing Agent
 Telegram Bot webhook handler for Vercel serverless deployment.
 Now with AI brain (Claude) and web search (Tavily).
 """
@@ -19,16 +19,16 @@ from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from urllib.error import URLError
 
-# ââ Config ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Config \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 BOT_USERNAME = os.environ.get("BOT_USERNAME", "nora_vitafirst_bot")
 ADMIN_CHAT_IDS = os.environ.get("ADMIN_CHAT_IDS", "").split(",")
 
-# ââ AI Config âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 AI Config \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 
-# ââ Email Config ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Email Config \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 NORA_EMAIL = os.environ.get("NORA_EMAIL", "nora@vitafirst.co")
 NORA_EMAIL_PASSWORD = os.environ.get("NORA_EMAIL_PASSWORD", "")
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
@@ -38,7 +38,7 @@ IMAP_PORT = int(os.environ.get("IMAP_PORT", "993"))
 
 API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# ââ Nora's system prompt ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Nora's system prompt \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 NORA_SYSTEM_PROMPT = """You are Nora, VitaFirst's digital supplier sourcing assistant.
 You work for VitaFirst (vitafirst.co).
 
@@ -53,7 +53,7 @@ Your email is nora@vitafirst.co.
 
 Your personality:
 - Professional, confident, and concise
-- Action-oriented â get to the point fast
+- Action-oriented \u2014 get to the point fast
 - Knowledgeable about supplements, vitamins, health products, and supply chains
 - You speak in first person as a team member of VitaFirst
 
@@ -68,9 +68,9 @@ When drafting outreach emails:
 - Keep emails SHORT: 4-6 sentences max, no fluff
 - Always mention VitaFirst is the largest sports nutrition distributor in Uzbekistan (since 2014)
 - Mention we work with brands like Ultimate Nutrition to build credibility
-- Make the supplier WANT to work with us â we bring volume and market access
+- Make the supplier WANT to work with us \u2014 we bring volume and market access
 - End with a clear call to action (schedule a call, send catalog, share pricing)
-- Professional but not overly formal â be direct and business-like
+- Professional but not overly formal \u2014 be direct and business-like
 
 When researching suppliers:
 - Look for company names, websites, contact info, MOQs, certifications
@@ -79,32 +79,34 @@ When researching suppliers:
 - Suggest outreach strategies
 
 Format your responses for Telegram (use *bold*, _italic_, and simple formatting).
-Keep responses concise â max 3-4 short paragraphs. Use bullet points for lists.
+Keep responses concise \u2014 max 3-4 short paragraphs. Use bullet points for lists.
 Do NOT use markdown headers (# or ##). Use *bold text* for section titles instead."""
 
-NORA_INTRO = """ð Hi! I'm *Nora*, VitaFirst's AI-powered supplier sourcing assistant.
+_NO_EMAIL_MSG = "(no email found \u2014 please reply with the address)"
+
+NORA_INTRO = """\U0001f44b Hi! I'm *Nora*, VitaFirst's AI-powered supplier sourcing assistant.
 
 Here's what I can do:
-â¢ ð *Research suppliers* â I search the web and give you real results
-â¢ ð§  *Answer questions* â ask me anything about supplements, sourcing, or market trends
-â¢ ð§ *Send & receive emails* â I have my own inbox at nora@vitafirst.co
-â¢ ð *Track tasks* â I keep a to-do list and report on progress
+\u2022 \U0001f50d *Research suppliers* \u2014 I search the web and give you real results
+\u2022 \U0001f9e0 *Answer questions* \u2014 ask me anything about supplements, sourcing, or market trends
+\u2022 \U0001f4e7 *Send & receive emails* \u2014 I have my own inbox at nora@vitafirst.co
+\u2022 \U0001f4cb *Track tasks* \u2014 I keep a to-do list and report on progress
 
 *How to use me in group chats:*
 Tag me like `@{bot_username} find suppliers for vitamin D3 capsules` and I'll research it!
 
 *Quick commands:*
-/start â This welcome message
-/help â Show all commands
-/tasks â View current task list
-/status â Get a progress report
-/inbox â Check my email inbox
-/sendemail â Send an email
-/newcontact â Log a new supplier contact
+/start \u2014 This welcome message
+/help \u2014 Show all commands
+/tasks \u2014 View current task list
+/status \u2014 Get a progress report
+/inbox \u2014 Check my email inbox
+/sendemail \u2014 Send an email
+/newcontact \u2014 Log a new supplier contact
 """
 
 
-# ââ Telegram API helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Telegram API helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def tg_request(method: str, data: dict = None):
     """Make a request to the Telegram Bot API."""
@@ -125,7 +127,7 @@ def tg_request(method: str, data: dict = None):
 def send_message(chat_id: int, text: str, parse_mode: str = "Markdown",
                  reply_to: int = None, reply_markup: dict = None):
     """Send a message to a chat, optionally with inline keyboard buttons."""
-    # Telegram has a 4096 char limit â split if needed
+    # Telegram has a 4096 char limit \u2014 split if needed
     if len(text) > 4000:
         text = text[:3950] + "\n\n_(message trimmed)_"
     data = {
@@ -176,7 +178,7 @@ def send_typing(chat_id: int):
     tg_request("sendChatAction", {"chat_id": chat_id, "action": "typing"})
 
 
-# ââ Web Search (Tavily) ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Web Search (Tavily) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def web_search(query: str, max_results: int = 5) -> list:
     """Search the web using Tavily API. Returns list of {title, url, content}."""
@@ -214,13 +216,13 @@ def web_search(query: str, max_results: int = 5) -> list:
         return []
 
 
-# ââ AI Brain (Claude) ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 AI Brain (Claude) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def ask_claude(user_message: str, search_context: str = "",
                user_name: str = "User") -> str:
     """Send a message to Claude API and get a response."""
     if not ANTHROPIC_API_KEY:
-        return "ð§  AI is not configured yet. Please add an ANTHROPIC_API_KEY."
+        return "\U0001f9e0 AI is not configured yet. Please add an ANTHROPIC_API_KEY."
 
     # Build the message with search context if available
     full_message = ""
@@ -259,7 +261,7 @@ def ask_claude(user_message: str, search_context: str = "",
             except Exception:
                 pass
         print(f"Claude API error: {e} | Body: {err_body}")
-        return "â ï¸ I'm having trouble connecting to my AI brain right now. Please try again in a moment."
+        return "\u26a0\ufe0f I'm having trouble connecting to my AI brain right now. Please try again in a moment."
     except Exception as e:
         err_body = ""
         if hasattr(e, 'read'):
@@ -268,7 +270,7 @@ def ask_claude(user_message: str, search_context: str = "",
             except Exception:
                 pass
         print(f"Claude API error: {e} | Body: {err_body}")
-        return f"â ï¸ AI error: {str(e)[:100]}"
+        return f"\u26a0\ufe0f AI error: {str(e)[:100]}"
 
 
 def nora_think(user_message: str, user_name: str = "User",
@@ -295,7 +297,7 @@ def nora_think(user_message: str, user_name: str = "User",
     return ask_claude(user_message, search_context, user_name)
 
 
-# ââ Email Functions ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Email Functions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def send_email(to_addr: str, subject: str, body: str) -> dict:
     """Send an email from Nora's inbox via SMTP."""
@@ -303,7 +305,7 @@ def send_email(to_addr: str, subject: str, body: str) -> dict:
         return {"ok": False, "error": "Email not configured (missing password)"}
     try:
         msg = MIMEMultipart()
-        msg["From"] = f"Nora â VitaFirst <{NORA_EMAIL}>"
+        msg["From"] = f"Nora \u2014 VitaFirst <{NORA_EMAIL}>"
         msg["To"] = to_addr
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain"))
@@ -384,10 +386,10 @@ def check_inbox(limit: int = 5) -> list:
         return []
 
 
-# ââ Task Management ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Task Management \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 class TaskStore:
-    """Lightweight task manager (stateless in serverless â use DB in prod)."""
+    """Lightweight task manager (stateless in serverless \u2014 use DB in prod)."""
 
     def __init__(self):
         self._tasks = {}
@@ -400,7 +402,7 @@ class TaskStore:
             "chat_id": chat_id,
             "description": description,
             "assigned_by": assigned_by,
-            "status": "ð New",
+            "status": "\U0001f195 New",
             "created_at": datetime.datetime.utcnow().isoformat(),
             "updated_at": datetime.datetime.utcnow().isoformat(),
             "notes": [],
@@ -426,19 +428,19 @@ class TaskStore:
     def format_tasks(self, chat_id: int = None) -> str:
         tasks = self.get_tasks(chat_id)
         if not tasks:
-            return "ð­ No tasks yet! Tag me with a task to get started."
-        lines = ["ð *Nora's Task Board*\n"]
+            return "\U0001f4ed No tasks yet! Tag me with a task to get started."
+        lines = ["\U0001f4cb *Nora's Task Board*\n"]
         for t in tasks:
             lines.append(
-                f"{t['status']} *#{t['id']}* â {t['description']}\n"
-                f"   _Assigned by {t['assigned_by']} â¢ {t['created_at'][:10]}_"
+                f"{t['status']} *#{t['id']}* \u2014 {t['description']}\n"
+                f"   _Assigned by {t['assigned_by']} \u2022 {t['created_at'][:10]}_"
             )
         return "\n\n".join(lines)
 
 
 store = TaskStore()
 
-# ââ Pending Email Drafts (in-memory, keyed by chat_id) ââââââââââââââââââââ
+# \u2500\u2500 Pending Email Drafts (in-memory, keyed by chat_id) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 # In serverless this resets per cold start, but survives within a warm instance.
 # Structure: { chat_id: { "to": str, "subject": str, "body": str, "msg_id": int } }
 _pending_drafts = {}
@@ -471,13 +473,13 @@ def _parse_draft_from_message(text: str) -> dict:
     return {"to": to_addr, "subject": subject, "body": body, "msg_id": None}
 
 
-# ââ Intent Detection âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Intent Detection \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def detect_intent(text: str) -> str:
     """Detect what the user wants Nora to do."""
     lower = text.lower()
 
-    # Supplier/product search â needs web search
+    # Supplier/product search \u2014 needs web search
     if any(kw in lower for kw in ["find", "search", "look for", "source",
                                    "supplier", "vendor", "manufacturer",
                                    "who sells", "where to buy", "where can i"]):
@@ -499,11 +501,11 @@ def detect_intent(text: str) -> str:
     if any(kw in lower for kw in ["price", "quote", "cost", "negotiate", "moq"]):
         return "pricing"
 
-    # General question â use AI but no search needed
+    # General question \u2014 use AI but no search needed
     return "general"
 
 
-# ââ Message Handling ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Message Handling \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def extract_task_from_mention(text: str, bot_username: str) -> str:
     """Extract the task/command after @bot_username mention."""
@@ -529,17 +531,17 @@ def handle_command(command: str, message: dict) -> str:
     elif command == "/status":
         tasks = store.get_tasks(chat_id)
         if not tasks:
-            return "ð *Status Report*\n\nNo active tasks. I'm ready for new assignments!"
+            return "\U0001f4ca *Status Report*\n\nNo active tasks. I'm ready for new assignments!"
         total = len(tasks)
         new = sum(1 for t in tasks if "New" in t["status"])
         in_progress = sum(1 for t in tasks if "Progress" in t["status"])
         done = sum(1 for t in tasks if "Done" in t["status"])
         return (
-            f"ð *Nora's Status Report*\n\n"
-            f"ð Total tasks: *{total}*\n"
-            f"ð New: *{new}*\n"
-            f"ð In Progress: *{in_progress}*\n"
-            f"â Completed: *{done}*\n\n"
+            f"\U0001f4ca *Nora's Status Report*\n\n"
+            f"\U0001f4cc Total tasks: *{total}*\n"
+            f"\U0001f195 New: *{new}*\n"
+            f"\U0001f504 In Progress: *{in_progress}*\n"
+            f"\u2705 Completed: *{done}*\n\n"
             f"_Last updated: {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}_"
         )
 
@@ -547,8 +549,8 @@ def handle_command(command: str, message: dict) -> str:
         send_typing(chat_id)
         emails = check_inbox(5)
         if not emails:
-            return "ð­ *Nora's Inbox*\n\nNo emails yet, or inbox is not configured."
-        lines = ["ð¬ *Nora's Inbox* (latest 5)\n"]
+            return "\U0001f4ed *Nora's Inbox*\n\nNo emails yet, or inbox is not configured."
+        lines = ["\U0001f4ec *Nora's Inbox* (latest 5)\n"]
         for i, em in enumerate(emails, 1):
             subj = em["subject"][:50] or "(no subject)"
             sender = em["from"][:40]
@@ -562,50 +564,50 @@ def handle_command(command: str, message: dict) -> str:
 
     elif command.startswith("/sendemail"):
         parts = command.replace("/sendemail", "").strip()
-        if not parts or " â " not in parts:
+        if not parts or " \u2014 " not in parts:
             return (
-                "ð§ *Send an Email as Nora*\n\n"
-                "Usage:\n`/sendemail to@email.com â Subject line â Email body text`\n\n"
+                "\U0001f4e7 *Send an Email as Nora*\n\n"
+                "Usage:\n`/sendemail to@email.com \u2014 Subject line \u2014 Email body text`\n\n"
                 "Example:\n"
-                "`/sendemail hello@nutravit.com â VitaFirst Partnership Inquiry â "
+                "`/sendemail hello@nutravit.com \u2014 VitaFirst Partnership Inquiry \u2014 "
                 "Hi, I'm reaching out from VitaFirst regarding a potential partnership "
                 "for vitamin D3 supply. Could we schedule a call?`"
             )
-        segments = parts.split(" â ", 2)
+        segments = parts.split(" \u2014 ", 2)
         if len(segments) < 3:
-            return "â Please use the format: `/sendemail to@email.com â Subject â Body`"
+            return "\u274c Please use the format: `/sendemail to@email.com \u2014 Subject \u2014 Body`"
         to_addr = segments[0].strip()
         subject = segments[1].strip()
         body = segments[2].strip()
 
         if "@" not in to_addr or "." not in to_addr:
-            return f"â `{to_addr}` doesn't look like a valid email address."
+            return f"\u274c `{to_addr}` doesn't look like a valid email address."
 
         send_typing(chat_id)
         result = send_email(to_addr, subject, body)
         if result["ok"]:
-            task = store.add(chat_id, f"ð§ Sent email to {to_addr}: {subject}", user_name)
+            task = store.add(chat_id, f"\U0001f4e7 Sent email to {to_addr}: {subject}", user_name)
             return (
-                f"â *Email Sent!*\n\n"
+                f"\u2705 *Email Sent!*\n\n"
                 f"*To:* {to_addr}\n"
                 f"*Subject:* {subject}\n"
                 f"*From:* nora@vitafirst.co\n\n"
                 f"_Logged as task #{task['id']}_"
             )
         else:
-            return f"â *Failed to send email*\n\n_{result['error']}_"
+            return f"\u274c *Failed to send email*\n\n_{result['error']}_"
 
     elif command.startswith("/newcontact"):
         parts = command.replace("/newcontact", "").strip()
         if not parts:
             return (
-                "ð *Log a New Supplier Contact*\n\n"
-                "Usage: `/newcontact Company Name â contact@email.com â notes`\n\n"
+                "\U0001f4c7 *Log a New Supplier Contact*\n\n"
+                "Usage: `/newcontact Company Name \u2014 contact@email.com \u2014 notes`\n\n"
                 "Example:\n"
-                "`/newcontact NutraVit Labs â hello@nutravit.com â Vitamin D3 supplier, MOQ 1000 units`"
+                "`/newcontact NutraVit Labs \u2014 hello@nutravit.com \u2014 Vitamin D3 supplier, MOQ 1000 units`"
             )
-        task = store.add(chat_id, f"ð New contact: {parts}", user_name)
-        return f"â Contact logged as task *#{task['id']}*!\n\n_{parts}_"
+        task = store.add(chat_id, f"\U0001f4c7 New contact: {parts}", user_name)
+        return f"\u2705 Contact logged as task *#{task['id']}*!\n\n_{parts}_"
 
     return None
 
@@ -617,7 +619,7 @@ def handle_mention(task_text: str, message: dict) -> str:
     user_name = user.get("first_name", "there")
 
     if not task_text:
-        return (f"Hi {user_name}! ð I'm Nora, VitaFirst's AI assistant.\n\n"
+        return (f"Hi {user_name}! \U0001f44b I'm Nora, VitaFirst's AI assistant.\n\n"
                 f"Ask me anything or give me a task, like:\n"
                 f"`@{BOT_USERNAME} find suppliers for collagen powder`\n"
                 f"`@{BOT_USERNAME} what's the market price for vitamin D3?`")
@@ -628,10 +630,10 @@ def handle_mention(task_text: str, message: dict) -> str:
     if intent in ("search_supplier", "research", "pricing"):
         send_typing(chat_id)
         response = nora_think(task_text, user_name, needs_search=True)
-        task = store.add(chat_id, f"ð {task_text}", user_name)
-        return f"{response}\n\n_Logged as task #{task['id']} â¢ /tasks to view all_"
+        task = store.add(chat_id, f"\U0001f50d {task_text}", user_name)
+        return f"{response}\n\n_Logged as task #{task['id']} \u2022 /tasks to view all_"
 
-    # For drafting / outreach â parallel: search for contact email + draft email
+    # For drafting / outreach \u2014 parallel: search for contact email + draft email
     elif intent == "draft":
         send_typing(chat_id)
 
@@ -656,8 +658,8 @@ def handle_mention(task_text: str, message: dict) -> str:
             f"2. Draft a SHORT outreach email (4-6 sentences MAX) from Nora at VitaFirst.\n\n"
             f"IMPORTANT EMAIL GUIDELINES:\n"
             f"- VitaFirst is the LARGEST sports nutrition distributor in Uzbekistan (since 2014)\n"
-            f"- We partner with brands like Ultimate Nutrition â mention this for credibility\n"
-            f"- Keep it SHORT and punchy â no long intros or filler paragraphs\n"
+            f"- We partner with brands like Ultimate Nutrition \u2014 mention this for credibility\n"
+            f"- Keep it SHORT and punchy \u2014 no long intros or filler paragraphs\n"
             f"- Make the supplier want to work with us (volume, market access, proven track record)\n"
             f"- End with a clear CTA: schedule a call, send catalog, or share pricing\n"
             f"- Sign off as: Nora, Supplier Relations, VitaFirst\n\n"
@@ -698,20 +700,20 @@ def handle_mention(task_text: str, message: dict) -> str:
 
         # 4) Store the pending draft and present with buttons
         preview = (
-            f"ð§ *Email Draft*\n\n"
-            f"*To:* {to_addr or '(no email found â please reply with the address)'}\n"
+            f"\U0001f4e7 *Email Draft*\n\n"
+            f"*To:* {to_addr or _NO_EMAIL_MSG}\n"
             f"*Subject:* {subject}\n\n"
             f"---\n{body}\n---"
         )
         if notes:
-            preview += f"\n\nð¡ _{notes}_"
+            preview += f"\n\n\U0001f4a1 _{notes}_"
 
         buttons = {
             "inline_keyboard": [
                 [
-                    {"text": "â Send", "callback_data": "email_send"},
-                    {"text": "âï¸ Edit", "callback_data": "email_edit"},
-                    {"text": "â Cancel", "callback_data": "email_cancel"},
+                    {"text": "\u2705 Send", "callback_data": "email_send"},
+                    {"text": "\u270f\ufe0f Edit", "callback_data": "email_edit"},
+                    {"text": "\u274c Cancel", "callback_data": "email_cancel"},
                 ]
             ]
         }
@@ -728,10 +730,10 @@ def handle_mention(task_text: str, message: dict) -> str:
             "msg_id": sent_msg_id,
             "user_name": user_name,
         }
-        task = store.add(chat_id, f"ð§ {task_text}", user_name)
+        task = store.add(chat_id, f"\U0001f4e7 {task_text}", user_name)
         return None  # Already sent the message with buttons
 
-    # General questions â use AI, maybe search if it seems fact-based
+    # General questions \u2014 use AI, maybe search if it seems fact-based
     else:
         send_typing(chat_id)
         # Decide if this needs a web search
@@ -758,7 +760,7 @@ def handle_callback_query(callback_query: dict) -> None:
         answer_callback(cb_id, "Error: no chat context")
         return
 
-    # ââ Email draft buttons ââ
+    # \u2500\u2500 Email draft buttons \u2500\u2500
     if data == "email_send":
         draft = _pending_drafts.get(chat_id)
         if not draft:
@@ -776,25 +778,29 @@ def handle_callback_query(callback_query: dict) -> None:
             answer_callback(cb_id, "No valid email address found")
             edit_message(chat_id, msg_id,
                          message.get("text", "") +
-                         "\n\n_â No valid recipient email found. Reply with the email address and I'll update the draft._")
+                         "\n\n_\u274c No valid recipient email found. Reply with the email address and I'll update the draft._")
             return
 
-        # Send the email
+        # Send the email -- acknowledge button FIRST to avoid timeout
+        answer_callback(cb_id, "\U0001f4e8 Sending...")
         send_typing(chat_id)
-        result = send_email(draft["to"], draft["subject"], draft["body"])
-        if result["ok"]:
-            answer_callback(cb_id, "â Email sent!")
+        try:
+            result = send_email(draft["to"], draft["subject"], draft["body"])
+            if result["ok"]:
+                edit_message(chat_id, msg_id,
+                             message.get("text", "") +
+                             f"\n\n\u2705 *Sent successfully* to {draft['to']}")
+                task = store.add(chat_id,
+                                 f"\U0001f4e7 Sent email to {draft['to']}: {draft['subject']}",
+                                 draft.get("user_name", user_name))
+            else:
+                edit_message(chat_id, msg_id,
+                             message.get("text", "") +
+                             f"\n\n\u274c *Failed:* _{result['error']}_")
+        except Exception as e:
             edit_message(chat_id, msg_id,
                          message.get("text", "") +
-                         f"\n\nâ *Sent successfully* to {draft['to']}")
-            task = store.add(chat_id,
-                             f"ð§ Sent email to {draft['to']}: {draft['subject']}",
-                             draft.get("user_name", user_name))
-        else:
-            answer_callback(cb_id, "â Failed to send")
-            edit_message(chat_id, msg_id,
-                         message.get("text", "") +
-                         f"\n\nâ *Failed:* _{result['error']}_")
+                         f"\n\n\u274c *Error:* _{str(e)}_")
         _pending_drafts.pop(chat_id, None)
 
     elif data == "email_edit":
@@ -812,7 +818,7 @@ def handle_callback_query(callback_query: dict) -> None:
     elif data == "email_cancel":
         answer_callback(cb_id, "Draft cancelled")
         edit_message(chat_id, msg_id,
-                     message.get("text", "") + "\n\nâ _Draft cancelled._")
+                     message.get("text", "") + "\n\n\u274c _Draft cancelled._")
         _pending_drafts.pop(chat_id, None)
 
     else:
@@ -822,7 +828,7 @@ def handle_callback_query(callback_query: dict) -> None:
 def process_update(update: dict) -> None:
     """Process an incoming Telegram update."""
 
-    # ââ Handle button callbacks ââ
+    # \u2500\u2500 Handle button callbacks \u2500\u2500
     callback_query = update.get("callback_query")
     if callback_query:
         handle_callback_query(callback_query)
@@ -839,13 +845,13 @@ def process_update(update: dict) -> None:
     if not text:
         return
 
-    # ââ Reply context: if user replies to Nora, treat as a follow-up ââ
+    # \u2500\u2500 Reply context: if user replies to Nora, treat as a follow-up \u2500\u2500
     reply_to_msg = message.get("reply_to_message")
     if reply_to_msg:
         reply_from = reply_to_msg.get("from", {})
         reply_username = reply_from.get("username", "")
         if reply_username.lower() == BOT_USERNAME.lower():
-            # User is replying to Nora â check if editing a draft
+            # User is replying to Nora \u2014 check if editing a draft
             draft = _pending_drafts.get(chat_id)
             if draft:
                 # User is providing edits or a recipient email
@@ -860,18 +866,18 @@ def process_update(update: dict) -> None:
                     _pending_drafts[chat_id] = draft
                     buttons = {
                         "inline_keyboard": [[
-                            {"text": "â Send", "callback_data": "email_send"},
-                            {"text": "âï¸ Edit", "callback_data": "email_edit"},
-                            {"text": "â Cancel", "callback_data": "email_cancel"},
+                            {"text": "\u2705 Send", "callback_data": "email_send"},
+                            {"text": "\u270f\ufe0f Edit", "callback_data": "email_edit"},
+                            {"text": "\u274c Cancel", "callback_data": "email_cancel"},
                         ]]
                     }
                     send_message(chat_id,
-                                 f"ð§ Updated recipient to *{draft['to']}*. Ready to send?\n\n"
+                                 f"\U0001f4e7 Updated recipient to *{draft['to']}*. Ready to send?\n\n"
                                  f"*Subject:* {draft['subject']}\n---\n{draft['body']}\n---",
                                  reply_markup=buttons)
                     return
 
-                # User wants to edit the draft â ask Claude to revise
+                # User wants to edit the draft \u2014 ask Claude to revise
                 edit_prompt = (
                     f"Here is the current email draft:\n"
                     f"TO: {draft['to']}\nSUBJECT: {draft['subject']}\n---\n{draft['body']}\n---\n\n"
@@ -901,13 +907,13 @@ def process_update(update: dict) -> None:
 
                 buttons = {
                     "inline_keyboard": [[
-                        {"text": "â Send", "callback_data": "email_send"},
-                        {"text": "âï¸ Edit", "callback_data": "email_edit"},
-                        {"text": "â Cancel", "callback_data": "email_cancel"},
+                        {"text": "\u2705 Send", "callback_data": "email_send"},
+                        {"text": "\u270f\ufe0f Edit", "callback_data": "email_edit"},
+                        {"text": "\u274c Cancel", "callback_data": "email_cancel"},
                     ]]
                 }
                 send_message(chat_id,
-                             f"ð§ *Revised Draft*\n\n"
+                             f"\U0001f4e7 *Revised Draft*\n\n"
                              f"*To:* {new_to}\n*Subject:* {new_subject}\n\n"
                              f"---\n{new_body}\n---",
                              reply_markup=buttons)
@@ -957,7 +963,7 @@ def process_update(update: dict) -> None:
         return
 
 
-# ââ Vercel Serverless Handler âââââââââââââââââââââââââââââââââââââââââââââââ
+# \u2500\u2500 Vercel Serverless Handler \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 class handler(BaseHTTPRequestHandler):
     """Vercel serverless function handler."""
@@ -989,9 +995,9 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.end_headers()
         response = {
-            "status": "â Nora is online",
+            "status": "\u2705 Nora is online",
             "bot": BOT_USERNAME,
-            "version": "2.2.0",
+            "version": "2.2.1",
             "ai": "Claude" if ANTHROPIC_API_KEY else "not configured",
             "search": "Tavily" if TAVILY_API_KEY else "not configured",
         }
