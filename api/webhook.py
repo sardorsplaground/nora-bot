@@ -40,12 +40,20 @@ API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
 # ââ Nora's system prompt ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 NORA_SYSTEM_PROMPT = """You are Nora, VitaFirst's digital supplier sourcing assistant.
-You work for VitaFirst (vitafirst.co), a health & wellness brand.
+You work for VitaFirst (vitafirst.co).
+
+About VitaFirst:
+- The largest distributor of sports nutrition and supplements in Uzbekistan
+- Operating since 2014 (10+ years in the market)
+- Partners with major international brands including Ultimate Nutrition and others
+- Strong distribution network across Uzbekistan with proven track record
+- Always looking to expand our portfolio with quality suppliers
+
 Your email is nora@vitafirst.co.
 
 Your personality:
-- Professional but warm and approachable
-- Concise and action-oriented
+- Professional, confident, and concise
+- Action-oriented â get to the point fast
 - Knowledgeable about supplements, vitamins, health products, and supply chains
 - You speak in first person as a team member of VitaFirst
 
@@ -55,6 +63,14 @@ Your capabilities:
 - Provide market intelligence on ingredients, pricing, and trends
 - Answer questions about the supplement/health product industry
 - Track tasks and provide status updates
+
+When drafting outreach emails:
+- Keep emails SHORT: 4-6 sentences max, no fluff
+- Always mention VitaFirst is the largest sports nutrition distributor in Uzbekistan (since 2014)
+- Mention we work with brands like Ultimate Nutrition to build credibility
+- Make the supplier WANT to work with us â we bring volume and market access
+- End with a clear call to action (schedule a call, send catalog, share pricing)
+- Professional but not overly formal â be direct and business-like
 
 When researching suppliers:
 - Look for company names, websites, contact info, MOQs, certifications
@@ -94,7 +110,7 @@ def tg_request(method: str, data: dict = None):
     """Make a request to the Telegram Bot API."""
     url = f"{API_BASE}/{method}"
     if data:
-        payload = json.dumps(data).encode("utf-8")
+        payload = json.dumps(data, ensure_ascii=False).encode("utf-8")
         req = Request(url, data=payload, headers={"Content-Type": "application/json"})
     else:
         req = Request(url)
@@ -428,6 +444,33 @@ store = TaskStore()
 _pending_drafts = {}
 
 
+def _parse_draft_from_message(text: str) -> dict:
+    """Parse TO, SUBJECT, and BODY from a draft preview message.
+    Used as fallback when _pending_drafts is lost after a cold start."""
+    if not text:
+        return None
+    to_addr = ""
+    subject = ""
+    body = ""
+    for line in text.split("\n"):
+        stripped = line.strip()
+        # Handle both Markdown (*To:*) and plain (To:) formats
+        clean = stripped.replace("*", "")
+        if clean.lower().startswith("to:"):
+            to_addr = clean.split(":", 1)[1].strip()
+        elif clean.lower().startswith("subject:"):
+            subject = clean.split(":", 1)[1].strip()
+    # Extract body between --- markers
+    parts = text.split("---")
+    if len(parts) >= 3:
+        body = parts[1].strip()
+    elif len(parts) >= 2:
+        body = parts[1].strip()
+    if not body:
+        return None
+    return {"to": to_addr, "subject": subject, "body": body, "msg_id": None}
+
+
 # ââ Intent Detection âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def detect_intent(text: str) -> str:
@@ -610,7 +653,14 @@ def handle_mention(task_text: str, message: dict) -> str:
             f"{task_text}\n\n"
             f"Based on the above request, please:\n"
             f"1. Identify the best email address to send this to from the search results.\n"
-            f"2. Draft a professional outreach email from Nora at VitaFirst.\n\n"
+            f"2. Draft a SHORT outreach email (4-6 sentences MAX) from Nora at VitaFirst.\n\n"
+            f"IMPORTANT EMAIL GUIDELINES:\n"
+            f"- VitaFirst is the LARGEST sports nutrition distributor in Uzbekistan (since 2014)\n"
+            f"- We partner with brands like Ultimate Nutrition â mention this for credibility\n"
+            f"- Keep it SHORT and punchy â no long intros or filler paragraphs\n"
+            f"- Make the supplier want to work with us (volume, market access, proven track record)\n"
+            f"- End with a clear CTA: schedule a call, send catalog, or share pricing\n"
+            f"- Sign off as: Nora, Supplier Relations, VitaFirst\n\n"
             f"Format your response EXACTLY like this:\n"
             f"TO: recipient@example.com\n"
             f"SUBJECT: Your subject line here\n"
@@ -712,10 +762,15 @@ def handle_callback_query(callback_query: dict) -> None:
     if data == "email_send":
         draft = _pending_drafts.get(chat_id)
         if not draft:
-            answer_callback(cb_id, "â ï¸ Draft expired (bot restarted)")
-            edit_message(chat_id, msg_id,
-                         message.get("text", "") + "\n\n_â ï¸ Draft expired._")
-            return
+            # Cold start fallback: parse draft from the message text
+            draft = _parse_draft_from_message(message.get("text", ""))
+            if draft:
+                draft["user_name"] = user_name
+            else:
+                answer_callback(cb_id, "Draft expired (bot restarted)")
+                edit_message(chat_id, msg_id,
+                             message.get("text", "") + "\n\nDraft expired. Please create a new one.")
+                return
 
         if not draft["to"] or "@" not in draft["to"]:
             answer_callback(cb_id, "No valid email address found")
@@ -743,10 +798,16 @@ def handle_callback_query(callback_query: dict) -> None:
         _pending_drafts.pop(chat_id, None)
 
     elif data == "email_edit":
+        # Ensure draft exists (cold start fallback)
+        if chat_id not in _pending_drafts:
+            draft = _parse_draft_from_message(message.get("text", ""))
+            if draft:
+                draft["user_name"] = user_name
+                _pending_drafts[chat_id] = draft
         answer_callback(cb_id, "Reply with your changes")
         edit_message(chat_id, msg_id,
                      message.get("text", "") +
-                     "\n\nâï¸ _Reply to this message with what you'd like to change._")
+                     "\n\nReply to this message with what you'd like to change.")
 
     elif data == "email_cancel":
         answer_callback(cb_id, "Draft cancelled")
@@ -930,7 +991,7 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "status": "â Nora is online",
             "bot": BOT_USERNAME,
-            "version": "2.1.0",
+            "version": "2.2.0",
             "ai": "Claude" if ANTHROPIC_API_KEY else "not configured",
             "search": "Tavily" if TAVILY_API_KEY else "not configured",
         }
