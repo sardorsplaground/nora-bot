@@ -7,6 +7,12 @@ import os
 import json
 import re
 import datetime
+import smtplib
+import imaplib
+import email as email_lib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import decode_header
 from http.server import BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
@@ -16,6 +22,14 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 BOT_USERNAME = os.environ.get("BOT_USERNAME", "nora_vitafirst_bot")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")  # Optional: for AI replies
 ADMIN_CHAT_IDS = os.environ.get("ADMIN_CHAT_IDS", "").split(",")  # Comma-separated
+
+# ── Email Config ────────────────────────────────────────────────────────────
+NORA_EMAIL = os.environ.get("NORA_EMAIL", "nora@vitafirst.co")
+NORA_EMAIL_PASSWORD = os.environ.get("NORA_EMAIL_PASSWORD", "")
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+IMAP_HOST = os.environ.get("IMAP_HOST", "imap.gmail.com")
+IMAP_PORT = int(os.environ.get("IMAP_PORT", "993"))
 
 API_BASE = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
@@ -28,7 +42,7 @@ NORA_INTRO = """👋 Hi! I'm *Nora*, VitaFirst's digital supplier sourcing assis
 
 Here's what I can do:
 • 🔍 *Find suppliers* — tag me with a product/brand and I'll research options
-• 📧 *Draft outreach messages* — I'll compose professional supplier emails
+• 📧 *Send & receive emails* — I have my own inbox at nora@vitafirst.co
 • 📋 *Track tasks* — I keep a to-do list and report on progress
 • 📊 *Status updates* — ask me for a progress report anytime
 
@@ -40,6 +54,8 @@ Tag me like `@{bot_username} find suppliers for vitamin D3 capsules` and I'll ge
 /help — Show all commands
 /tasks — View current task list
 /status — Get a progress report
+/inbox — Check my email inbox
+/sendemail — Send an email
 /newcontact — Log a new supplier contact
 """
 
@@ -78,6 +94,100 @@ def send_message(chat_id: int, text: str, parse_mode: str = "Markdown",
 def send_typing(chat_id: int):
     """Show typing indicator."""
     tg_request("sendChatAction", {"chat_id": chat_id, "action": "typing"})
+
+
+# ── Email Functions ────────────────────────────────────────────────────────
+
+def send_email(to_addr: str, subject: str, body: str) -> dict:
+    """Send an email from Nora's inbox via SMTP."""
+    if not NORA_EMAIL_PASSWORD:
+        return {"ok": False, "error": "Email not configured (missing password)"}
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = f"Nora — VitaFirst <{NORA_EMAIL}>"
+        msg["To"] = to_addr
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(NORA_EMAIL, NORA_EMAIL_PASSWORD)
+            server.send_message(msg)
+
+        return {"ok": True, "to": to_addr, "subject": subject}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+def check_inbox(limit: int = 5) -> list:
+    """Check Nora's inbox for recent emails via IMAP."""
+    if not NORA_EMAIL_PASSWORD:
+        return []
+    try:
+        mail = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
+        mail.login(NORA_EMAIL, NORA_EMAIL_PASSWORD)
+        mail.select("INBOX")
+
+        _, data = mail.search(None, "ALL")
+        email_ids = data[0].split()
+
+        # Get the last N emails
+        recent_ids = email_ids[-limit:] if len(email_ids) >= limit else email_ids
+        recent_ids = list(reversed(recent_ids))  # Newest first
+
+        emails = []
+        for eid in recent_ids:
+            _, msg_data = mail.fetch(eid, "(RFC822)")
+            raw = msg_data[0][1]
+            msg = email_lib.message_from_bytes(raw)
+
+            # Decode subject
+            subj_parts = decode_header(msg["Subject"] or "")
+            subject = ""
+            for part, enc in subj_parts:
+                if isinstance(part, bytes):
+                    subject += part.decode(enc or "utf-8", errors="replace")
+                else:
+                    subject += part
+
+            # Decode from
+            from_parts = decode_header(msg["From"] or "")
+            from_addr = ""
+            for part, enc in from_parts:
+                if isinstance(part, bytes):
+                    from_addr += part.decode(enc or "utf-8", errors="replace")
+                else:
+                    from_addr += part
+
+            # Get date
+            date_str = msg["Date"] or ""
+
+            # Get plain text body (first 200 chars)
+            body_preview = ""
+            if msg.is_multipart():
+                for part in msg.walk():
+                    if part.get_content_type() == "text/plain":
+                        payload = part.get_payload(decode=True)
+                        if payload:
+                            body_preview = payload.decode("utf-8", errors="replace")[:200]
+                        break
+            else:
+                payload = msg.get_payload(decode=True)
+                if payload:
+                    body_preview = payload.decode("utf-8", errors="replace")[:200]
+
+            emails.append({
+                "from": from_addr,
+                "subject": subject,
+                "date": date_str,
+                "preview": body_preview.strip(),
+            })
+
+        mail.logout()
+        return emails
+    except Exception as e:
+        print(f"IMAP error: {e}")
+        return []
 
 
 # ── Task Management ────────────────────────────────────────────────────────
@@ -183,6 +293,57 @@ def handle_command(command: str, message: dict) -> str:
             f"✅ Completed: *{done}*\n\n"
             f"_Last updated: {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}_"
         )
+
+    elif command == "/inbox":
+        send_typing(chat_id)
+        emails = check_inbox(5)
+        if not emails:
+            return "📭 *Nora's Inbox*\n\nNo emails yet, or inbox is not configured."
+        lines = ["📬 *Nora's Inbox* (latest 5)\n"]
+        for i, em in enumerate(emails, 1):
+            subj = em["subject"][:50] or "(no subject)"
+            sender = em["from"][:40]
+            preview = em["preview"][:80]
+            lines.append(
+                f"*{i}.* {subj}\n"
+                f"   _From:_ {sender}\n"
+                f"   _{preview}{'...' if len(em['preview']) > 80 else ''}_\n"
+            )
+        return "\n".join(lines)
+
+    elif command.startswith("/sendemail"):
+        parts = command.replace("/sendemail", "").strip()
+        if not parts or " — " not in parts:
+            return (
+                "📧 *Send an Email as Nora*\n\n"
+                "Usage:\n`/sendemail to@email.com — Subject line — Email body text`\n\n"
+                "Example:\n"
+                "`/sendemail hello@nutravit.com — VitaFirst Partnership Inquiry — "
+                "Hi, I'm reaching out from VitaFirst regarding a potential partnership "
+                "for vitamin D3 supply. Could we schedule a call?`"
+            )
+        segments = parts.split(" — ", 2)
+        if len(segments) < 3:
+            return "❌ Please use the format: `/sendemail to@email.com — Subject — Body`"
+        to_addr, subject, body = segments[0].strip(), segments[1].strip(), segments[2].strip()
+
+        # Basic email validation
+        if "@" not in to_addr or "." not in to_addr:
+            return f"❌ `{to_addr}` doesn't look like a valid email address."
+
+        send_typing(chat_id)
+        result = send_email(to_addr, subject, body)
+        if result["ok"]:
+            task = store.add(chat_id, f"📧 Sent email to {to_addr}: {subject}", user_name)
+            return (
+                f"✅ *Email Sent!*\n\n"
+                f"*To:* {to_addr}\n"
+                f"*Subject:* {subject}\n"
+                f"*From:* nora@vitafirst.co\n\n"
+                f"_Logged as task #{task['id']}_"
+            )
+        else:
+            return f"❌ *Failed to send email*\n\n_{result['error']}_"
 
     elif command.startswith("/newcontact"):
         parts = command.replace("/newcontact", "").strip()
