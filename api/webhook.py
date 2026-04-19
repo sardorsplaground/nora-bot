@@ -156,7 +156,7 @@ def ask_claude(user_message: str, search_context: str = "", user_name: str = "Us
     full_message += f"Message from {user_name} in the VitaFirst team Telegram:\n{user_message}"
     try:
         url = "https://api.anthropic.com/v1/messages"
-        payload = json.dumps({"model": "claude-sonnet-4-20250514", "max_tokens": 1024, "system": NORA_SYSTEM_PROMPT, "messages": [{"role": "user", "content": full_message}]}).encode("utf-8")
+        payload = json.dumps({"model": "claude-sonnet-4-6", "max_tokens": 1024, "system": NORA_SYSTEM_PROMPT, "messages": [{"role": "user", "content": full_message}]}).encode("utf-8")
         req = Request(url, data=payload, headers={"Content-Type": "application/json", "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01"})
         with urlopen(req, timeout=25) as resp:
             data = json.loads(resp.read().decode())
