@@ -1,0 +1,6 @@
+[project]
+name = "nora-bot"
+version = "1.0.0"
+description = "Nora - VitaFirst Telegram Bot"
+requires-python = ">=3.12"
+dependencies = []
