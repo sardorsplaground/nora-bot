@@ -310,7 +310,7 @@ def send_email(to_addr: str, subject: str, body: str) -> dict:
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain"))
 
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=7) as server:
             server.starttls()
             server.login(NORA_EMAIL, NORA_EMAIL_PASSWORD)
             server.send_message(msg)
@@ -325,7 +325,7 @@ def check_inbox(limit: int = 5) -> list:
     if not NORA_EMAIL_PASSWORD:
         return []
     try:
-        mail = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT)
+        mail = imaplib.IMAP4_SSL(IMAP_HOST, IMAP_PORT, timeout=7)
         mail.login(NORA_EMAIL, NORA_EMAIL_PASSWORD)
         mail.select("INBOX")
 
@@ -997,7 +997,7 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "status": "\u2705 Nora is online",
             "bot": BOT_USERNAME,
-            "version": "2.2.1",
+            "version": "2.2.2",
             "ai": "Claude" if ANTHROPIC_API_KEY else "not configured",
             "search": "Tavily" if TAVILY_API_KEY else "not configured",
         }
