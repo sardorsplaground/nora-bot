@@ -17,7 +17,7 @@ class handler(BaseHTTPRequestHandler):
             }).encode('utf-8')
             req = Request('https://api.resend.com/emails', data=payload, headers={
                 'Content-Type': 'application/json',
-                'Authorization': f'Bearer {key}'
+                'Authorization': f'Bearer {key}', 'User-Agent': 'NoraBot/2.3'
             })
             with urlopen(req, timeout=10) as r:
                 body = r.read().decode()
