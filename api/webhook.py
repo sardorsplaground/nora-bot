@@ -31,6 +31,7 @@ TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
 # \u2500\u2500 Email Config \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 NORA_EMAIL = os.environ.get("NORA_EMAIL", "nora@vitafirst.co")
 NORA_EMAIL_PASSWORD = os.environ.get("NORA_EMAIL_PASSWORD", "")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 IMAP_HOST = os.environ.get("IMAP_HOST", "imap.gmail.com")
@@ -300,12 +301,36 @@ def nora_think(user_message: str, user_name: str = "User",
 # \u2500\u2500 Email Functions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
 def send_email(to_addr: str, subject: str, body: str) -> dict:
-    """Send an email from Nora's inbox via SMTP."""
+    """Send an email via Resend HTTP API (primary) or SMTP (fallback)."""
+    # Prefer Resend HTTP API (works on Vercel serverless where SMTP port 587 is blocked)
+    if RESEND_API_KEY:
+        try:
+            payload = json.dumps({
+                "from": f"Nora — VitaFirst <{NORA_EMAIL}>",
+                "to": [to_addr],
+                "subject": subject,
+                "text": body
+            }).encode("utf-8")
+            req = Request(
+                "https://api.resend.com/emails",
+                data=payload,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {RESEND_API_KEY}"
+                }
+            )
+            with urlopen(req, timeout=8) as resp:
+                result = json.loads(resp.read().decode())
+                return {"ok": True, "to": to_addr, "subject": subject, "id": result.get("id", "")}
+        except Exception as e:
+            return {"ok": False, "error": f"Resend API error: {str(e)}"}
+
+    # SMTP fallback (won't work on Vercel but kept for local/other deployments)
     if not NORA_EMAIL_PASSWORD:
-        return {"ok": False, "error": "Email not configured (missing password)"}
+        return {"ok": False, "error": "Email not configured (missing RESEND_API_KEY or NORA_EMAIL_PASSWORD)"}
     try:
         msg = MIMEMultipart()
-        msg["From"] = f"Nora \u2014 VitaFirst <{NORA_EMAIL}>"
+        msg["From"] = f"Nora — VitaFirst <{NORA_EMAIL}>"
         msg["To"] = to_addr
         msg["Subject"] = subject
         msg.attach(MIMEText(body, "plain"))
@@ -318,7 +343,6 @@ def send_email(to_addr: str, subject: str, body: str) -> dict:
         return {"ok": True, "to": to_addr, "subject": subject}
     except Exception as e:
         return {"ok": False, "error": str(e)}
-
 
 def check_inbox(limit: int = 5) -> list:
     """Check Nora's inbox for recent emails via IMAP."""
@@ -1000,7 +1024,7 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "status": "\u2705 Nora is online",
             "bot": BOT_USERNAME,
-            "version": "2.2.3",
+            "version": "2.3.0",
             "ai": "Claude" if ANTHROPIC_API_KEY else "not configured",
             "search": "Tavily" if TAVILY_API_KEY else "not configured",
         }
