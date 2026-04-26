@@ -316,7 +316,7 @@ def send_email(to_addr: str, subject: str, body: str) -> dict:
                 data=payload,
                 headers={
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {RESEND_API_KEY}"
+                    "Authorization": f"Bearer {RESEND_API_KEY}", "User-Agent": "NoraBot/2.3"
                 }
             )
             with urlopen(req, timeout=8) as resp:
