@@ -117,7 +117,7 @@ def tg_request(method: str, data: dict = None):
     else:
         req = Request(url)
     try:
-        with urlopen(req) as resp:
+        with urlopen(req, timeout=8) as resp:
             return json.loads(resp.read().decode())
     except Exception as e:
         print(f"Telegram API error: {e}")
@@ -761,6 +761,7 @@ def handle_callback_query(callback_query: dict) -> None:
         return
 
     # \u2500\u2500 Email draft buttons \u2500\u2500
+    print(f"[CALLBACK] data={data} chat_id={chat_id} msg_id={msg_id}")
     if data == "email_send":
         draft = _pending_drafts.get(chat_id)
         if not draft:
@@ -782,10 +783,12 @@ def handle_callback_query(callback_query: dict) -> None:
             return
 
         # Send the email -- acknowledge button FIRST to avoid timeout
+        print(f"[EMAIL] Sending to: {draft.get('to', '?')}")
         answer_callback(cb_id, "\U0001f4e8 Sending...")
         send_typing(chat_id)
         try:
             result = send_email(draft["to"], draft["subject"], draft["body"])
+            print(f"[EMAIL] send_email result: {result}")
             if result["ok"]:
                 edit_message(chat_id, msg_id,
                              message.get("text", "") +
@@ -997,7 +1000,7 @@ class handler(BaseHTTPRequestHandler):
         response = {
             "status": "\u2705 Nora is online",
             "bot": BOT_USERNAME,
-            "version": "2.2.2",
+            "version": "2.2.3",
             "ai": "Claude" if ANTHROPIC_API_KEY else "not configured",
             "search": "Tavily" if TAVILY_API_KEY else "not configured",
         }
